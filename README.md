@@ -4,6 +4,47 @@ Projeto desenvolvido em Python com o objetivo de aplicar conceitos básicos de a
 
 A análise utiliza dados históricos de PETR4 e VALE3 para construir uma carteira com pesos iguais entre os dois ativos. O desempenho da carteira é analisado por meio de métricas de retorno e risco e comparado com referências do mercado brasileiro.
 
+## Summary (English)
+
+Python analysis of a 50/50 PETR4/VALE3 portfolio over 2025 (January 2 to December 30), using Yahoo Finance prices and the CDI rate from the Central Bank of Brazil. The portfolio returned 19.5%, against 34.9% for the BOVA11 benchmark and 14.3% for the CDI, with a maximum drawdown of 15.2% (6.7% for BOVA11) and a Sharpe ratio of 0.30 (1.11 for BOVA11). Results are reported for a daily-rebalanced and a buy-and-hold version of the portfolio. This is a learning project, and its conclusions are limited to one year and two stocks.
+
+## Principais Resultados
+
+Período: de 2 de janeiro a 30 de dezembro de 2025 (250 pregões). Preços ajustados por proventos.
+
+| Ativo | Retorno acumulado | Volatilidade anual | Sharpe Ratio | Drawdown máximo |
+|---|---|---|---|---|
+| PETR4 | -6,66% | 22,67% | -0,83 | -21,06% |
+| VALE3 | 50,13% | 22,00% | 1,33 | -15,39% |
+| BOVA11 (benchmark) | 34,93% | 15,56% | 1,11 | -6,73% |
+| Carteira 50/50 (rebalanceada diariamente) | 19,54% | 17,43% | 0,30 | -15,21% |
+| Carteira 50/50 (sem rebalancear) | 21,74% | 17,39% | 0,41 | -15,23% |
+| CDI | 14,32% | n/a | n/a | n/a |
+
+Como ler as colunas de diferença em relação ao BOVA11 no arquivo `tabela_resumo.csv`:
+
+* `Dif. Acumulado vs BOVA11`: diferença entre os retornos acumulados. A carteira rebalanceada ficou 15,38 p.p. abaixo do BOVA11, e a carteira sem rebalancear, 13,19 p.p. abaixo.
+* `Excesso vs BOVA11`: diferença entre os retornos médios anualizados (média diária multiplicada por 252, a mesma base usada no Sharpe). Por isso o valor da carteira rebalanceada (-12,08 p.p.) é diferente da diferença acumulada.
+
+## Interpretação
+
+* A carteira rendeu mais que o CDI (14,32%), mas ficou abaixo do BOVA11 com mais volatilidade (17,43% contra 15,56%) e queda máxima maior (15,21% contra 6,73%). Por isso o Sharpe ficou em 0,30, contra 1,11 do índice.
+* O resultado vem de dois papéis com desempenhos opostos no período (PETR4 em -6,66% e VALE3 em +50,13%). A carteira reflete essas duas empresas, e não a diversificação de um índice.
+* A correlação entre os retornos diários de PETR4 e VALE3 foi de 0,2176. Com ela, a volatilidade da carteira cai de cerca de 22% para 17,43%, o que confere com a fórmula abaixo. Mesmo assim, dois ativos não chegam à volatilidade do índice (15,56%).
+
+$$\sigma_p = \sqrt{0{,}5^2\sigma_A^2 + 0{,}5^2\sigma_B^2 + 2 \cdot 0{,}5 \cdot 0{,}5\,\rho\,\sigma_A\sigma_B} \approx 17{,}43\%$$
+
+* O rebalanceamento diário reduz o retorno acumulado em cerca de 2,2 p.p. (19,54% contra 21,74%), porque vende o ativo que sobe e compra o que cai todos os dias. Parte da defasagem para o BOVA11 vem dessa premissa, e não da escolha dos ativos.
+
+## Limitações e Premissas
+
+* A análise cobre um único ano e apenas dois ativos. O resultado depende do período e não permite concluir sobre a eficácia de uma estratégia.
+* O retorno é medido a partir do fechamento de 2 de janeiro de 2025.
+* A carteira "rebalanceada diariamente" reaplica 50/50 todos os dias, o que na prática teria custos. A versão sem rebalancear mantém os pesos iniciais.
+* Não há custos de transação nem impostos.
+* O Sharpe usa o retorno médio diário multiplicado por 252 e o CDI médio do período como taxa livre de risco.
+* Os preços vêm do Yahoo Finance com ajuste por proventos. O histórico pode ser revisado, e os valores podem variar nas casas decimais ao reexecutar.
+
 ## Objetivos do Projeto
 
 * Coletar dados históricos de ativos financeiros;
@@ -45,7 +86,9 @@ O projeto calcula as seguintes métricas:
 * Correlação;
 * Drawdown;
 * Drawdown máximo;
-* Excesso de retorno em relação ao BOVA11.
+* Excesso de retorno em relação ao BOVA11;
+* Métricas da carteira 50/50 sem rebalanceamento (buy-and-hold);
+* Diferença de retorno acumulado em relação ao BOVA11.
 
 ## Visualizações
 
@@ -79,6 +122,8 @@ O notebook apresenta a análise de forma passo a passo, separando:
 * análise de drawdown.
 
 Essa versão permite visualizar tabelas, gráficos e resultados diretamente ao longo da execução das células.
+
+O notebook reproduz a análise da carteira rebalanceada diariamente. A versão sem rebalancear e a coluna de diferença acumulada estão no `main.py`.
 
 ## Tecnologias Utilizadas
 

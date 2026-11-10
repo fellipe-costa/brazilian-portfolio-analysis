@@ -85,7 +85,7 @@ def calcular_correlacao(retornos):
 # Calcular Drawdown
 def calcular_drawdown(retornos):
     acumulado = (1 + retornos).cumprod()
-    pico_historico = acumulado.cummax()
+    pico_historico = acumulado.cummax().clip(lower=1.0)  # o valor inicial (base 1) também conta como pico
     drawdown = acumulado / pico_historico - 1
     return drawdown
 
@@ -248,6 +248,28 @@ tabela_resumo.loc["CARTEIRA 50/50"] = [
     resultado_carteira["retorno_medio_anual"] - resultado_benchmark["retorno_medio_anual_benchmark"]
 ]
 
+# Adicionar Carteira 50/50 sem rebalanceamento (buy-and-hold)
+# A carteira acima reaplica 50/50 todos os dias (rebalanceamento diário).
+# Aqui os pesos iniciais são mantidos e a carteira acompanha os preços dos ativos.
+valor_bh = (1 + retornos).cumprod().dot(pesos)
+retornos_bh = valor_bh.pct_change()
+retornos_bh.iloc[0] = valor_bh.iloc[0] - 1
+resultado_bh = analise_ativos(retornos_bh, taxa_livre_risco)
+
+tabela_resumo.loc["CARTEIRA 50/50 (sem rebalancear)"] = [
+    resultado_bh["retorno_medio_anual"],
+    resultado_bh["retorno_acumulado"].iloc[-1],
+    resultado_bh["volatilidade_anual"],
+    resultado_bh["sharpe"],
+    resultado_bh["drawdown_max"],
+    resultado_bh["retorno_medio_anual"] - resultado_benchmark["retorno_medio_anual_benchmark"]
+]
+
+# Diferença de retorno acumulado em relação ao BOVA11
+tabela_resumo["Dif. Acumulado vs BOVA11"] = (
+    tabela_resumo["Retorno Acumulado"] - tabela_resumo.loc["BOVA11.SA", "Retorno Acumulado"]
+)
+
 # Formatar Tabela
 tabela_formatada = tabela_resumo.copy()
 
@@ -256,7 +278,8 @@ colunas_percentuais = [
     "Retorno Acumulado",
     "Volatilidade Anual",
     "Drawdown Máximo",
-    "Excesso vs BOVA11"
+    "Excesso vs BOVA11",
+    "Dif. Acumulado vs BOVA11"
 ]
 
 for coluna in colunas_percentuais:
